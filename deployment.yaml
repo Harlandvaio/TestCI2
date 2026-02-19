@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-web-deployment
+spec:
+  replicas: 2          # 讓 K8s 同時跑 2 個副本，壞了一個另一個還在
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: my-web-app
+        image: harland2005/testci:latest  # 使用你之前推送到 Docker Hub 的那個
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-web-service
+spec:
+  type: NodePort       # 讓外部可以訪問
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30008  # 固定訪問埠
